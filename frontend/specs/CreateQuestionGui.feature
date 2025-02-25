@@ -7,6 +7,7 @@ Feature: Create question GUI
     * I add the answer "5" marked as incorrect
     * I save the question
     Then I see a link to take the question
+    * I see a link to edit the question
     When I take the question
     Then I see the question and the answers
 

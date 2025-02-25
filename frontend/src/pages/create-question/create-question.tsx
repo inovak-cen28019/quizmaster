@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { type QuestionApiData, saveQuestion, getQuestion, updateQuestion } from 'api/quiz-question.ts'
 
-import { ErrorMessage, LoadedIndicator, QuestionLink } from './components'
+import { ErrorMessage, LoadedIndicator, QuestionLink, EditQuestionLink} from './components'
 import { emptyQuestionFormData, QuestionEditForm, toQuestionApiData, toQuestionFormData } from './form'
 
 export function CreateQuestionForm() {
@@ -14,6 +14,7 @@ export function CreateQuestionForm() {
 
     const [isLoaded, setIsLoaded] = useState<boolean>(false)
     const [linkToQuestion, setLinkToQuestion] = useState<string>('')
+    const [linkToEditQuestion, setLinkToEditQuestion] = useState<string>('')
     const [errorMessage, setErrorMessage] = useState<string>('')
 
     useEffect(() => {
@@ -30,11 +31,24 @@ export function CreateQuestionForm() {
     const postData = async (formData: QuestionApiData) =>
         questionId
             ? updateQuestion(formData, questionId)
-                  .then(() => setLinkToQuestion(`${location.origin}/question/${questionId}`))
-                  .catch(error => setLinkToQuestion(error.message))
+                  .then(() => {setLinkToQuestion(`${location.origin}/question/${questionId}`)
+                  setLinkToEditQuestion(`${location.origin}/question/abchash`)
+                })
+                  .catch(error => {
+                    setLinkToQuestion(error.message)
+                    setLinkToEditQuestion(error.message)
+                })
             : saveQuestion(formData)
-                  .then(newQuestionId => setLinkToQuestion(`${location.origin}/question/${newQuestionId}`))
-                  .catch(error => setLinkToQuestion(error.message))
+                  .then(newQuestionId => {
+                    setLinkToQuestion(`${location.origin}/question/${newQuestionId}`)
+                    setLinkToEditQuestion(`${location.origin}/question/abchash`)
+                    console.log('Question saved')}
+
+                )
+                  .catch(error => {setLinkToQuestion(error.message)
+                                  setLinkToEditQuestion(error.message)}
+                )
+
 
     const handleSubmit = () => {
         setErrorMessage('')
@@ -84,6 +98,7 @@ export function CreateQuestionForm() {
             <QuestionEditForm questionData={questionData} setQuestionData={setQuestionData} onSubmit={handleSubmit} />
             <ErrorMessage errorMessage={errorMessage} />
             <QuestionLink url={linkToQuestion} />
+            { FEATURE_FLAG_ENABLED && <EditQuestionLink url={linkToEditQuestion} /> }
             <LoadedIndicator isLoaded={isLoaded} />
         </div>
     )

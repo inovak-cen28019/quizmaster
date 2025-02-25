@@ -114,6 +114,11 @@ Then('I see a link to take the question', async function () {
     expect(url).not.toBe('')
 })
 
+Then('I see a link to edit the question', async function () {
+    const url = await this.createQuestionPage.editUrl()
+    expect(url).not.toBe('')
+})
+
 Then('I see an error message', async function () {
     const errorMessage = await this.createQuestionPage.errorMessage()
     expect(errorMessage).not.toBe('')

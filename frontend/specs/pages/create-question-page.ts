@@ -44,6 +44,7 @@ export class CreateQuestionPage {
 
     private questionUrlLocator = () => this.page.locator('#question-link')
     questionUrl = () => this.questionUrlLocator().textContent()
-
+    private editUrlLocator = () => this.page.locator('#edit-link')
+    editUrl = () => this.editUrlLocator().textContent()
     errorMessage = () => this.page.textContent('#error-message')
 }
