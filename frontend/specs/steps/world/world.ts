@@ -1,4 +1,4 @@
-import type { Page, TestInfo } from '@playwright/test'
+import type { Page, TestInfo, Browser } from '@playwright/test'
 
 import { CreateQuestionPage, QuizPage, TakeQuestionPage } from '../../pages'
 import type { Question } from './question'
@@ -7,6 +7,7 @@ export class QuizmasterWorld {
     constructor(
         public page: Page,
         public testInfo: TestInfo,
+        public browser: Browser
     ) {
         this.createQuestionPage = new CreateQuestionPage(this.page)
         this.takeQuestionPage = new TakeQuestionPage(this.page)

@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
+import java.util.*;
 
 import java.util.Optional;
 
@@ -28,14 +29,28 @@ public class QuizQuestionController {
     }
 
     @Transactional
-    @PostMapping("/quiz-question")
-    public Integer saveQuestion(@RequestBody QuizQuestion question) {
-        return quizQuestionRepository.save(question).getId();
+    @GetMapping("/quiz-question/{uid}/edit")
+    public ResponseEntity<QuizQuestion> getQuestion(@PathVariable String uid) {
+
+        return response(findQuestionForEdit(uid));
     }
 
     @Transactional
-    @PatchMapping("/quiz-question/{id}")
-    public Integer updateQuestion(@RequestBody QuizQuestion question, @PathVariable Integer id) {
+    @PostMapping("/quiz-question")
+    public ResponseEntity<Map<String, String>> saveQuestion(@RequestBody QuizQuestion question) {
+        var response = new HashMap<String, String>();
+        var uid = UUID.randomUUID().toString().replace("-", "").substring(0, 10);
+        question.setUid(uid);
+        var questionRepository = quizQuestionRepository.save(question);
+        response.put("id", questionRepository.getId().toString());
+        response.put("uid", questionRepository.getUid());
+        return ResponseEntity.ok(response);
+    }
+
+    @Transactional
+    @PatchMapping("/quiz-question/{uid}")
+    public Integer updateQuestion(@RequestBody QuizQuestion question, @PathVariable String uid) {
+        var id = findQuestionForEdit(uid).map(QuizQuestion::getId).orElseThrow();
         question.setId(id);
         System.out.println("Updating question: " + question);
         quizQuestionRepository.save(question);
@@ -50,6 +65,10 @@ public class QuizQuestionController {
 
     private Optional<QuizQuestion> findQuestion(Integer id) {
         return quizQuestionRepository.findById(id);
+    }
+
+    private Optional<QuizQuestion> findQuestionForEdit(String uid) {
+        return quizQuestionRepository.findByUid(uid);
     }
 
     private <T> ResponseEntity<T> response(Optional<T> entity) {
